@@ -1,0 +1,208 @@
+---
+openapi: 3.0.0
+info:
+  title: API Fédération Agricole
+  version: 1.0.0
+  description: API de gestion des collectivités agricoles à Madagascar
+paths:
+  /collectivites:
+    post:
+      summary: Créer une collectivité
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Collectivite"
+      responses:
+        "201":
+          description: Collectivité créée
+    get:
+      summary: Liste des collectivités
+      responses:
+        "200":
+          description: Liste récupérée
+  "/collectivites/{id}/membres":
+    post:
+      summary: Ajouter un membre
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Membre"
+      responses:
+        "201":
+          description: Membre ajouté
+  /cotisations:
+    post:
+      summary: Enregistrer une cotisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Cotisation"
+      responses:
+        "201":
+          description: Cotisation enregistrée
+    get:
+      summary: Liste des cotisations
+      responses:
+        "200":
+          description: Liste récupérée
+  /comptes:
+    post:
+      summary: Créer un compte
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Compte"
+      responses:
+        "201":
+          description: Compte créé
+    get:
+      summary: Liste des comptes
+      responses:
+        "200":
+          description: Liste récupérée
+  /activites:
+    post:
+      summary: Créer une activité
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Activite"
+      responses:
+        "201":
+          description: Activité créée
+    get:
+      summary: Liste des activités
+      responses:
+        "200":
+          description: Liste récupérée
+  "/activites/{id}/presences":
+    post:
+      summary: Enregistrer une présence
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Presence"
+      responses:
+        "201":
+          description: Présence enregistrée
+  /statistiques:
+    get:
+      summary: Obtenir les statistiques globales
+      responses:
+        "200":
+          description: Statistiques récupérées
+  "/membres/{id}/statistiques":
+    get:
+      summary: Statistiques d’un membre
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Statistiques du membre
+components:
+  schemas:
+    Collectivite:
+      type: object
+      required:
+        - nom
+        - numero
+        - ville
+      properties:
+        nom:
+          type: string
+        numero:
+          type: string
+        ville:
+          type: string
+        specialite:
+          type: string
+        date_creation:
+          type: string
+          format: date
+    Membre:
+      type: object
+      required:
+        - nom
+        - prenom
+        - email
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+        date_naissance:
+          type: string
+          format: date
+        genre:
+          type: string
+        adresse:
+          type: string
+        metier:
+          type: string
+        telephone:
+          type: string
+        email:
+          type: string
+        date_adhesion:
+          type: string
+          format: date
+    Cotisation:
+      type: object
+      properties:
+        montant:
+          type: number
+        date:
+          type: string
+          format: date
+        type:
+          type: string
+    Compte:
+      type: object
+      properties:
+        type:
+          type: string
+        solde:
+          type: number
+    Activite:
+      type: object
+      properties:
+        type:
+          type: string
+        date:
+          type: string
+          format: date
+        obligatoire:
+          type: boolean
+    Presence:
+      type: object
+      properties:
+        statut:
+          type: string
