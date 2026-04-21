@@ -1,7 +1,6 @@
 package com.example.demo.repository;
 
-import com.example.demo.exception.NotFoundException;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.demo.config.DBConnection;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -10,17 +9,12 @@ import java.util.UUID;
 @Repository
 public class CollectivityRepository {
 
-    @Value("${spring.datasource.url}")
-    private String url;
-
-    @Value("${spring.datasource.username}")
-    private String username;
-
-    @Value("${spring.datasource.password}")
-    private String password;
-
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        try {
+            return DBConnection.getConnection();
+        } catch (Exception e) {
+            throw new SQLException("Erreur de connexion : " + e.getMessage(), e);
+        }
     }
 
     public UUID save(String location,

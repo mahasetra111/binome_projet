@@ -1,10 +1,10 @@
 package com.example.demo.repository;
 
+import com.example.demo.config.DBConnection;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.Gender;
 import com.example.demo.model.Member;
 import com.example.demo.model.MemberOccupation;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import java.sql.Date;
 
@@ -14,17 +14,12 @@ import java.util.*;
 @Repository
 public class MemberRepository {
 
-    @Value("${spring.datasource.url}")
-    private String url;
-
-    @Value("${spring.datasource.username}")
-    private String username;
-
-    @Value("${spring.datasource.password}")
-    private String password;
-
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        try {
+            return DBConnection.getConnection();
+        } catch (Exception e) {
+            throw new SQLException("Erreur de connexion : " + e.getMessage(), e);
+        }
     }
 
     // ---------------------------------------------------------------
