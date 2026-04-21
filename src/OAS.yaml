@@ -127,6 +127,42 @@ paths:
       responses:
         "200":
           description: Statistiques du membre
+  /admissions:
+    post:
+      summary: Demande d’adhésion à une collectivité (règles B-2)
+      description: |
+        Un candidat doit être parrainé par au moins 2 membres confirmés
+        et payer les frais + cotisation annuelle.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Admission"
+      responses:
+        "201":
+          description: Candidat accepté
+        "400":
+          description: Candidat refusé (conditions non respectées)
+
+  /federation/statistiques:
+    get:
+      summary: Rapport global de la fédération
+      parameters:
+        - name: periode
+          in: query
+          schema:
+            type: string
+          description: mensuel ou annuel
+      responses:
+        "200":
+          description: Rapport global
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatistiquesFederation"
+
+
 components:
   schemas:
     Collectivite:
@@ -206,3 +242,48 @@ components:
       properties:
         statut:
           type: string
+
+
+    Admission:
+      type: object
+      required:
+        - candidat
+        - collectivite_id
+        - parrains
+      properties:
+        candidat:
+          $ref: "#/components/schemas/Membre"
+
+        collectivite_id:
+          type: integer
+
+        parrains:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            properties:
+              membre_id:
+                type: integer
+              relation:
+                type: string
+                description: famille, ami, collègue, etc.
+    StatistiquesFederation:
+      type: object
+      properties:
+        collectivites:
+          type: array
+          items:
+            type: object
+            properties:
+              collectivite_id:
+                type: integer
+
+              taux_assiduite:
+                type: number
+
+              pourcentage_cotisation_a_jour:
+                type: number
+
+              nouveaux_adherents:
+                type: integer
