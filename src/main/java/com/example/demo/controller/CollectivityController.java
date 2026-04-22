@@ -26,4 +26,9 @@ public class CollectivityController {
         List<Collectivity> created = collectivityService.createCollectivities(dtos);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+    @GetMapping
+    public ResponseEntity<List<Collectivity>> getCollectivities() {
+        List<Collectivity> collectivities = collectivityService.getAllCollectivities();
+        return ResponseEntity.ok(collectivities);
+    }
 }

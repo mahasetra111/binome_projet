@@ -26,6 +26,9 @@ public class CollectivityService {
         this.collectivityRepository = collectivityRepository;
         this.memberRepository = memberRepository;
     }
+    public List<Collectivity> getAllCollectivities() {
+        return collectivityRepository.findAll();
+    }
 
     public List<Collectivity> createCollectivities(List<CreateCollectivityDto> dtos) {
         List<Collectivity> result = new ArrayList<>();

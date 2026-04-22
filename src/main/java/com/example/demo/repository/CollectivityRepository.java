@@ -1,9 +1,12 @@
 package com.example.demo.repository;
 
 import com.example.demo.config.DBConnection;
+import com.example.demo.model.Collectivity;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -15,6 +18,30 @@ public class CollectivityRepository {
         } catch (Exception e) {
             throw new SQLException("Erreur de connexion : " + e.getMessage(), e);
         }
+    }
+
+    public List<Collectivity> findAll() {
+        List<Collectivity> list = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            String sql = "SELECT * FROM collectivity";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                Collectivity c = new Collectivity();
+                c.setId(UUID.fromString(rs.getString("id")));
+                c.setLocation(rs.getString("location"));
+
+                list.add(c);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
     public UUID save(String location,
