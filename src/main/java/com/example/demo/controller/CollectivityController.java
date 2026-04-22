@@ -31,4 +31,10 @@ public class CollectivityController {
         List<Collectivity> collectivities = collectivityService.getAllCollectivities();
         return ResponseEntity.ok(collectivities);
     }
+    @PutMapping("/collectivities/{id}/informations")
+    public ResponseEntity<Collectivity> updateCollectivity(
+            @PathVariable String id,
+            @RequestBody CollectivityInformation dto) {
+        return ResponseEntity.ok(collectivityService.update(id, dto));
+    }
 }

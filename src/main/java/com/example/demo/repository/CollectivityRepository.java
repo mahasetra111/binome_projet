@@ -91,4 +91,20 @@ public class CollectivityRepository {
             throw new RuntimeException("Erreur SQL existsById collectivity : " + e.getMessage(), e);
         }
     }
+    public void updateCollectivity(String id, String name, int number) {
+        try (Connection conn = DBConnection.getConnection()) {
+
+            String sql = "UPDATE collectivity SET name = ?, number = ? WHERE id = ?";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setInt(2, number);
+            ps.setObject(3, UUID.fromString(id));
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

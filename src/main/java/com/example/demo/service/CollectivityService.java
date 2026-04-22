@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.CollectivityInformation;
 import com.example.demo.dto.CreateCollectivityDto;
 import com.example.demo.dto.CreateCollectivityStructureDto;
 import com.example.demo.exception.BadRequestException;
@@ -26,6 +27,7 @@ public class CollectivityService {
         this.collectivityRepository = collectivityRepository;
         this.memberRepository = memberRepository;
     }
+
     public List<Collectivity> getAllCollectivities() {
         return collectivityRepository.findAll();
     }
@@ -148,5 +150,16 @@ public class CollectivityService {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("UUID invalide pour '" + fieldName + "' : " + value);
         }
+    }
+    public Collectivity update(String id, CollectivityInformation dto) {
+
+        collectivityRepository.updateCollectivity(
+                id,
+                dto.getName(),
+                dto.getNumber()
+                // + structure si ajoutée dans DTO
+        );
+
+        return collectivityRepository.existsById(id);
     }
 }
