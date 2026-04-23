@@ -206,4 +206,46 @@ public class CollectivityRepository {
         }
         return null;
     }
+    public void updateCollectivity(UUID id, String name, Integer number) {
+        try (Connection conn = DBConnection.getConnection()) {
+
+            String sql = "UPDATE collectivity SET name = ?, number = ? WHERE id = ?";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setInt(2, number);
+            ps.setObject(3, id); // UUID direct
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public Collectivity findById(UUID id) {
+        try (Connection conn = DBConnection.getConnection()) {
+
+            String sql = "SELECT * FROM collectivity WHERE id = ?";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setObject(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Collectivity c = new Collectivity();
+                c.setId(UUID.fromString(rs.getString("id")));
+                c.setName(rs.getString("name"));
+                c.setNumber(rs.getInt("number"));
+                c.setLocation(rs.getString("location"));
+
+                return c;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null; // ou throw exception
+    }
 }

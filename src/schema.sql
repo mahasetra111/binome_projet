@@ -55,3 +55,39 @@ INSERT INTO member (id, first_name, last_name, birth_date, gender, address, prof
 VALUES
   ('a0000000-0000-0000-0000-000000000001', 'Jean', 'Rakoto', '1990-01-01', 'MALE', 'Tana', 'Agriculteur', '034000001', 'jean@test.com', 'SENIOR', CURRENT_DATE),
   ('a0000000-0000-0000-0000-000000000002', 'Marie', 'Rabe', '1992-05-10', 'FEMALE', 'Tana', 'Agriculteur', '034000002', 'marie@test.com', 'SENIOR', CURRENT_DATE);
+
+CREATE TABLE membership_fee (
+                                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                collectivity_id UUID REFERENCES collectivity(id),
+                                eligible_from DATE,
+                                frequency VARCHAR(20),
+                                amount DECIMAL,
+                                label VARCHAR(100),
+                                status VARCHAR(20)
+);
+
+CREATE TABLE member_payment (
+                                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                member_id UUID REFERENCES member(id),
+                                membership_fee_id UUID,
+                                amount INTEGER,
+                                payment_mode VARCHAR(30),
+                                account_id UUID,
+                                creation_date DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE collectivity_transaction (
+                                          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                          collectivity_id UUID REFERENCES collectivity(id),
+                                          amount DECIMAL,
+                                          payment_mode VARCHAR(30),
+                                          account_id UUID,
+                                          member_id UUID,
+                                          creation_date DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE financial_account (
+                                   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                   type VARCHAR(30),
+                                   amount DECIMAL
+);

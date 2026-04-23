@@ -20,6 +20,10 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    @GetMapping
+    public List<Member> getAll() {
+        return memberService.findAll();
+    }
     @PostMapping
     public ResponseEntity<List<Member>> createMembers(@RequestBody List<CreateMemberDto> dtos) {
         List<Member> created = memberService.createMembers(dtos);

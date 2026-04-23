@@ -118,4 +118,7 @@ public class MemberService {
             throw new BadRequestException("UUID invalide pour '" + fieldName + "' : " + value);
         }
     }
+    public List<Member> findAll() {
+        return memberRepository.findAll();
+    }
 }

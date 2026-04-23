@@ -27,6 +27,9 @@ public class CollectivityService {
         this.collectivityRepository = collectivityRepository;
         this.memberRepository = memberRepository;
     }
+    public List<Collectivity> findAll() {
+        return collectivityRepository.findAll();
+    }
 
     public List<Collectivity> getAllCollectivities() {
         return collectivityRepository.findAll();
@@ -153,13 +156,18 @@ public class CollectivityService {
     }
     public Collectivity update(String id, CollectivityInformation dto) {
 
-        collectivityRepository.updateCollectivity(
-                id,
-                dto.getName(),
-                dto.getNumber()
-                // + structure si ajoutée dans DTO
-        );
+        UUID uuid = UUID.fromString(id);
 
-        return collectivityRepository.existsById(id);
+        // ✔ Vérification
+        if (!collectivityRepository.existsById(uuid)) {
+            throw new RuntimeException("Collectivity not found");
+        }
+
+        // ✔ Update
+        collectivityRepository.updateCollectivity(uuid, dto.getName(), dto.getNumber());
+
+        // ✔ Retourner la collectivité
+        return collectivityRepository.findById(uuid);
     }
+
 }

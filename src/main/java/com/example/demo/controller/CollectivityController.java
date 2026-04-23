@@ -25,6 +25,12 @@ public class CollectivityController {
         this.collectivityIdentityService = collectivityIdentityService;
     }
 
+    @GetMapping
+    public List<Collectivity> getAll() {
+        return collectivityService.findAll();
+    }
+
+
     @PostMapping
     public ResponseEntity<List<Collectivity>> createCollectivities(
             @RequestBody List<CreateCollectivityDto> dtos) {
@@ -40,4 +46,5 @@ public class CollectivityController {
         Collectivity updated = collectivityIdentityService.assignIdentity(id, dto);
         return ResponseEntity.ok(updated);
     }
+
 }

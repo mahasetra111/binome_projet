@@ -185,4 +185,31 @@ public class MemberRepository {
         if (joinedAt != null) m.setJoinedAt(joinedAt.toLocalDate());
         return m;
     }
+    public List<Member> findAll() {
+
+        List<Member> list = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            String sql = "SELECT * FROM member";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Member m = new Member();
+                m.setId(UUID.fromString(rs.getString("id")));
+                m.setFirstName(rs.getString("first_name"));
+                m.setLastName(rs.getString("last_name"));
+                m.setEmail(rs.getString("email"));
+
+                list.add(m);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
