@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.AssignCollectivityIdentityDto;
+import com.example.demo.dto.CollectivityInformation;
 import com.example.demo.dto.CreateCollectivityDto;
 import com.example.demo.model.Collectivity;
 import com.example.demo.service.CollectivityIdentityService;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -30,6 +32,18 @@ public class CollectivityController {
         return collectivityService.findAll();
     }
 
+    @GetMapping("/{id}")
+    public Collectivity getById(@PathVariable String id) {
+        return collectivityService.getCollectivityWithMembers(id);
+    }
+
+    @GetMapping("/{id}/financialAccounts")
+    public List<Map<String, Object>> getAccounts(
+            @PathVariable String id,
+            @RequestParam String at
+    ) {
+        return collectivityService.getAccountsAtDate(id, at);
+    }
 
     @PostMapping
     public ResponseEntity<List<Collectivity>> createCollectivities(
@@ -47,4 +61,12 @@ public class CollectivityController {
         return ResponseEntity.ok(updated);
     }
 
+    @PutMapping("/{id}/informations")
+    public ResponseEntity<?> updateCollectivity(
+            @PathVariable String id,
+            @RequestBody CollectivityInformation dto
+    ) {
+        Collectivity updated = collectivityService.update(id, dto);
+        return ResponseEntity.ok(updated);
+    }
 }

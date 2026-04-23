@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.config.DBConnection;
 import com.example.demo.dto.CollectivityInformation;
 import com.example.demo.dto.CreateCollectivityDto;
 import com.example.demo.dto.CreateCollectivityStructureDto;
@@ -12,9 +13,11 @@ import com.example.demo.repository.CollectivityRepository;
 import com.example.demo.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 @Service
 public class CollectivityService {
@@ -33,6 +36,32 @@ public class CollectivityService {
 
     public List<Collectivity> getAllCollectivities() {
         return collectivityRepository.findAll();
+    }
+    public Collectivity findById(String id) {
+
+        Collectivity collectivity = null;
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            String sql = "SELECT * FROM collectivity WHERE id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setObject(1, UUID.fromString(id));
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                collectivity = new Collectivity();
+                collectivity.setId(UUID.fromString(rs.getString("id")));
+                collectivity.setName(rs.getString("name"));
+                collectivity.setNumber(rs.getInt("number"));
+                collectivity.setLocation(rs.getString("location"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return collectivity;
     }
 
     public List<Collectivity> createCollectivities(List<CreateCollectivityDto> dtos) {
@@ -156,18 +185,112 @@ public class CollectivityService {
     }
     public Collectivity update(String id, CollectivityInformation dto) {
 
-        UUID uuid = UUID.fromString(id);
+        try (Connection conn = DBConnection.getConnection()) {
 
-        // ✔ Vérification
-        if (!collectivityRepository.existsById(uuid)) {
-            throw new RuntimeException("Collectivity not found");
+            String sql = """
+            UPDATE collectivity
+            SET name = ?, number = ?
+            WHERE id = ?
+        """;
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, dto.getName());
+            ps.setInt(2, dto.getNumber());
+            ps.setObject(3, UUID.fromString(id));
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        // ✔ Update
-        collectivityRepository.updateCollectivity(uuid, dto.getName(), dto.getNumber());
+        return findById(id);
+    }
 
-        // ✔ Retourner la collectivité
-        return collectivityRepository.findById(uuid);
+    public Collectivity getCollectivityWithMembers(String id) {
+
+        Collectivity c = null;
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            // 1. collectivity
+            String sql = "SELECT * FROM collectivity WHERE id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setObject(1, UUID.fromString(id));
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                c = new Collectivity();
+                c.setId(UUID.fromString(rs.getString("id")));
+                c.setName(rs.getString("name"));
+                c.setNumber(rs.getInt("number"));
+                c.setLocation(rs.getString("location"));
+            }
+
+            // 2. members
+            String sqlMembers = "SELECT * FROM member WHERE collectivity_id = ?";
+            PreparedStatement ps2 = conn.prepareStatement(sqlMembers);
+            ps2.setObject(1, UUID.fromString(id));
+
+            ResultSet rs2 = ps2.executeQuery();
+
+            List<Member> members = new ArrayList<>();
+
+            while (rs2.next()) {
+                Member m = new Member();
+                m.setId(UUID.fromString(rs2.getString("id")));
+                m.setFirstName(rs2.getString("first_name"));
+                m.setLastName(rs2.getString("last_name"));
+                members.add(m);
+            }
+
+            if (c != null) {
+                c.setMembers(members);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return c;
+    }
+    public List<Map<String, Object>> getAccountsAtDate(String collectivityId, String at) {
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            String sql = """
+            SELECT id, type, amount
+            FROM financial_account
+            WHERE id = ?
+        """;
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setObject(1, UUID.fromString(collectivityId));
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Map<String, Object> acc = new HashMap<>();
+
+                acc.put("id", rs.getObject("id"));
+                acc.put("type", rs.getString("type"));
+                acc.put("amount", rs.getDouble("amount"));
+
+                // ⚠️ simplifié : version future = historique par date
+                acc.put("asOfDate", at);
+
+                result.add(acc);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
 }
